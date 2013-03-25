@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2CBAFB8116FDC2B3005FE437 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CBAFB8016FDC2B3005FE437 /* MapKit.framework */; };
+		2CBAFB831700AAE6005FE437 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CBAFB821700AAE6005FE437 /* CoreLocation.framework */; };
+		69ED708479FA688CA963EAEB /* NSMutableDictionary+SetInsertion.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED723B7055006A275A090C /* NSMutableDictionary+SetInsertion.m */; };
 		69ED70C92E5825B3FF2FFC24 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 69ED753C0FBA1171B5E42435 /* InfoPlist.strings */; };
 		69ED71A8166E51D8D8B39214 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ED76A96CD7FAD781E672EF /* Default-568h@2x.png */; };
 		69ED71D610219574503D89FE /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 69ED7CF4DEE0272CEBED989E /* ViewController_iPad.xib */; };
@@ -21,6 +23,7 @@
 		69ED78B13B911586DFD8DC95 /* SDMapViewCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7852923DF154264D9648 /* SDMapViewCoordinator.m */; };
 		69ED797506D10E245BA926CF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ED75A6AB3819161A9CE824 /* CoreGraphics.framework */; };
 		69ED7B18B4F67F881F662E8E /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ED7982BFC11D5301FA3D76 /* Default.png */; };
+		69ED7B99E49B1B79D1D2457E /* NSValue+CLLocationCoordinate2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7449DA7AED217A4AD5FC /* NSValue+CLLocationCoordinate2D.m */; };
 		69ED7CDB1AB017EF2CE3A5D1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ED76CE0B997FAC2466941F /* Foundation.framework */; };
 		69ED7D255CFA722C384CC1CE /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ED771CC3BD605270F51EAE /* Default@2x.png */; };
 		69ED7D452A462E3C6685F4CC /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED71CCB7CFE84231F50261 /* ViewController.m */; };
@@ -30,13 +33,16 @@
 
 /* Begin PBXFileReference section */
 		2CBAFB8016FDC2B3005FE437 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		2CBAFB821700AAE6005FE437 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		69ED70758CE2A5850C130CEF /* SDQuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDQuadTree.h; sourceTree = "<group>"; };
 		69ED7138D2780CC379985556 /* SDDelegateMultiplier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDDelegateMultiplier.h; sourceTree = "<group>"; };
 		69ED71CCB7CFE84231F50261 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		69ED723B7055006A275A090C /* NSMutableDictionary+SetInsertion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+SetInsertion.m"; sourceTree = "<group>"; };
 		69ED724A498353350AECD1A4 /* Airport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Airport.m; sourceTree = "<group>"; };
 		69ED73A90B56663776F86FAC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
 		69ED73EFC050DD2798A237C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		69ED74088C04EA4E7A509B12 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		69ED7449DA7AED217A4AD5FC /* NSValue+CLLocationCoordinate2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+CLLocationCoordinate2D.m"; sourceTree = "<group>"; };
 		69ED756B3FCAADD3D82360C9 /* SDMapView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SDMapView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		69ED75A6AB3819161A9CE824 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		69ED7640B65F6DE1E11689DE /* SDMapView-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = "SDMapView-Info.plist"; sourceTree = "<group>"; };
@@ -50,6 +56,8 @@
 		69ED794C334A53C1640CEAC6 /* SDQuadTree.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDQuadTree.m; sourceTree = "<group>"; };
 		69ED7982BFC11D5301FA3D76 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		69ED79AB69D8B5723E9C5CA9 /* SDMapView-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SDMapView-Prefix.pch"; sourceTree = "<group>"; };
+		69ED7AA56BF17CE1BF459F58 /* NSValue+CLLocationCoordinate2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+CLLocationCoordinate2D.h"; sourceTree = "<group>"; };
+		69ED7BC2C74DB634CF5EA279 /* NSMutableDictionary+SetInsertion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+SetInsertion.h"; sourceTree = "<group>"; };
 		69ED7C10E7D4CD470B8A9A79 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		69ED7C2E27F333C83B343597 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		69ED7C39BA6EAD91D337098F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -65,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CBAFB831700AAE6005FE437 /* CoreLocation.framework in Frameworks */,
 				2CBAFB8116FDC2B3005FE437 /* MapKit.framework in Frameworks */,
 				69ED72793D8DEDD324F0E3AD /* UIKit.framework in Frameworks */,
 				69ED7CDB1AB017EF2CE3A5D1 /* Foundation.framework in Frameworks */,
@@ -104,6 +113,10 @@
 				69ED7F374305B0395792CA01 /* SDMapView.h */,
 				69ED7DED307595D21096A299 /* SDDelegateMultiplier.m */,
 				69ED7138D2780CC379985556 /* SDDelegateMultiplier.h */,
+				69ED723B7055006A275A090C /* NSMutableDictionary+SetInsertion.m */,
+				69ED7BC2C74DB634CF5EA279 /* NSMutableDictionary+SetInsertion.h */,
+				69ED7449DA7AED217A4AD5FC /* NSValue+CLLocationCoordinate2D.m */,
+				69ED7AA56BF17CE1BF459F58 /* NSValue+CLLocationCoordinate2D.h */,
 			);
 			path = "Map View";
 			sourceTree = "<group>";
@@ -111,6 +124,7 @@
 		69ED71E5CAF129736264FBCC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2CBAFB821700AAE6005FE437 /* CoreLocation.framework */,
 				2CBAFB8016FDC2B3005FE437 /* MapKit.framework */,
 				69ED7C39BA6EAD91D337098F /* UIKit.framework */,
 				69ED76CE0B997FAC2466941F /* Foundation.framework */,
@@ -222,6 +236,8 @@
 				69ED7F2D2F50E9B943AE1975 /* SDMapView.m in Sources */,
 				69ED7EC2527D208D884C8BB4 /* Airport.m in Sources */,
 				69ED74E1A5FD1A481D6CFA12 /* SDDelegateMultiplier.m in Sources */,
+				69ED708479FA688CA963EAEB /* NSMutableDictionary+SetInsertion.m in Sources */,
+				69ED7B99E49B1B79D1D2457E /* NSValue+CLLocationCoordinate2D.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

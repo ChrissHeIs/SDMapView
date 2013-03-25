@@ -1,49 +1,58 @@
 //
 // Created by dmitriy on 24.03.13.
 //
-#import <MapKit/MapKit.h>
 #import "SDMapView.h"
+
+#import <MapKit/MapKit.h>
+
 #import "SDQuadTree.h"
 #import "SDDelegateMultiplier.h"
 
+#import "NSMutableDictionary+SetInsertion.h"
+#import "NSValue+CLLocationCoordinate2D.h"
 
 const NSUInteger SDMapViewMaxZoomLevel = 20;
 const double  SDMapViewMercatorRadius = 85445659.44705395;
 
 @interface SDAnnotationsChange : NSObject
 
-@property (nonatomic, strong, readonly) NSNumber *targetLevel;
-@property (nonatomic, strong, readonly) NSNumber *sourceLevel;
+/**
+* NSOrderedAscending equals to zoom in
+* NSOrderedSame equals to no changes in zoom
+* NSOrderedDescending equals to zoom out
+*/
+@property (nonatomic, readonly) NSComparisonResult order;
+
+
 @property (nonatomic, copy, readonly) NSArray *sourceAnnotations;
 @property (nonatomic, copy, readonly) NSArray *targetAnnotations;
 
 - (id)initWithTargetAnnotations:(NSArray *)targetAnnotations
-					targetLevel:(NSNumber *)targetLevel
 			  sourceAnnotations:(NSArray *)sourceAnnotations
-					sourceLevel:(NSNumber *)sourceLevel;
+						  order:(NSComparisonResult)order;
 
 @end
 
 @implementation SDAnnotationsChange
 
 - (id)initWithTargetAnnotations:(NSArray *)targetAnnotations
-					targetLevel:(NSNumber *)targetLevel
 			  sourceAnnotations:(NSArray *)sourceAnnotations
-					sourceLevel:(NSNumber *)sourceLevel
+						  order:(NSComparisonResult)order
 {
 	self = [super init];
 	if (self)
 	{
-		_targetLevel = targetLevel;
 		_sourceAnnotations = sourceAnnotations;
 		_targetAnnotations = targetAnnotations;
-		_sourceLevel = sourceLevel;
+		_order = order;
 	}
 
 	return self;
 }
 
 @end
+
+#pragma mark - SDMapView
 
 @interface SDMapView () <MKMapViewDelegate>
 {
@@ -60,13 +69,20 @@ const double  SDMapViewMercatorRadius = 85445659.44705395;
 
 - (void)updateAnnotationsToLevel:(NSNumber *)toLevel fromLevel:(NSNumber *)fromLevel;
 - (void)setNeedsUpdateAnnotationsToLevel:(NSNumber *)toLevel fromLevel:(NSNumber *)fromLevel;
-- (void)setNeedsUpdateAnnotations;
 
 @property (nonatomic) NSUInteger zoomLevel;
 - (void)updateZoomLevel;
 
-- (void)registerChange:(SDAnnotationsChange *)change;
-- (SDAnnotationsChange *)unregisterChange;
+- (void)processChange:(SDAnnotationsChange *)change;
+- (void)enqueueChange:(SDAnnotationsChange *)change;
+- (SDAnnotationsChange *)dequeueChange;
+
+- (void)didZoomInWithChange:(SDAnnotationsChange *)change annotationViews:(NSArray *)views;
+- (void)didZoomOutWithChange:(SDAnnotationsChange *)change annotationViews:(NSArray *)views;
+
+- (CGAffineTransform)translateTransformFrom:(CLLocationCoordinate2D)fromCoordinate
+										 to:(CLLocationCoordinate2D)toCoordinate
+								 withinView:(UIView *)view;
 
 @end
 
@@ -142,12 +158,12 @@ const double  SDMapViewMercatorRadius = 85445659.44705395;
 
 #pragma mark - Annotations Update
 
-- (void)registerChange:(SDAnnotationsChange *)change
+- (void)enqueueChange:(SDAnnotationsChange *)change
 {
 	[_changes addObject:change];
 }
 
-- (SDAnnotationsChange *)unregisterChange
+- (SDAnnotationsChange *)dequeueChange
 {
 	if (_changes.count == 0) return nil;
 
@@ -160,22 +176,34 @@ const double  SDMapViewMercatorRadius = 85445659.44705395;
 
 - (void)updateAnnotationsToLevel:(NSNumber *)toLevel fromLevel:(NSNumber *)fromLevel
 {
+	NSParameterAssert(toLevel != nil && fromLevel != nil);
+
 	MKMapRect rect = self.visibleMapRect;
-	if (MKMapRectWorld.size.width <= rect.origin.x + 10)
+	if (rect.origin.x + 10.0 > MKMapRectWorld.size.width)
 	{
 		rect.origin.x = 0.0;
 	}
-	NSArray *sourceAnnotations = [super annotations];
-	NSArray *targetAnnotations = [[self.tree annotationsInRect:rect maxTraversalDepth:[toLevel unsignedIntegerValue]] allObjects];
 
-	SDAnnotationsChange *change = [[SDAnnotationsChange alloc] initWithTargetAnnotations:targetAnnotations
-																			 targetLevel:toLevel
-																	   sourceAnnotations:sourceAnnotations
-																			 sourceLevel:fromLevel];
-	[self registerChange:change];
+	NSSet *targetAnnotations = [self.tree annotationsInRect:rect maxTraversalDepth:[toLevel unsignedIntegerValue]];
+	NSMutableSet *sourceAnnotations = [[NSMutableSet alloc] initWithArray:[super annotations]];
+	[sourceAnnotations minusSet:targetAnnotations];
 
-	[super removeAnnotations:sourceAnnotations];
-	[super addAnnotations:targetAnnotations];
+	SDAnnotationsChange *change = [[SDAnnotationsChange alloc] initWithTargetAnnotations:[targetAnnotations allObjects]
+																	   sourceAnnotations:[sourceAnnotations allObjects]
+																				   order:[fromLevel compare:toLevel]];
+	[self processChange:change];
+}
+
+- (void)processChange:(SDAnnotationsChange *)change
+{
+	[self enqueueChange:change];
+
+	if (change.order != NSOrderedDescending)
+	{
+		[super removeAnnotations:change.sourceAnnotations];
+	}
+
+	[super addAnnotations:change.targetAnnotations];
 }
 
 - (void)setNeedsUpdateAnnotationsToLevel:(NSNumber *)toLevel fromLevel:(NSNumber *)fromLevel
@@ -189,7 +217,9 @@ const double  SDMapViewMercatorRadius = 85445659.44705395;
 	}
 
 	SEL updateSelector = @selector(updateAnnotationsToLevel:fromLevel:);
+
 	[NSInvocation cancelPreviousPerformRequestsWithTarget:_updateInvocation selector:updateSelector object:nil];
+
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:updateSelector]];
 	[invocation setSelector:updateSelector];
 	[invocation setTarget:self];
@@ -226,35 +256,33 @@ const double  SDMapViewMercatorRadius = 85445659.44705395;
 	return view;
 }
 
-- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
+#pragma mark - Annotation Views Animation
+
+- (CGAffineTransform)translateTransformFrom:(CLLocationCoordinate2D)fromCoordinate
+										 to:(CLLocationCoordinate2D)toCoordinate
+								 withinView:(UIView *)view
 {
-	SDAnnotationsChange *change = [self unregisterChange];
+	CGPoint sourcePoint = [self convertCoordinate:fromCoordinate toPointToView:view];
+	CGPoint targetPoint = [self convertCoordinate:toCoordinate toPointToView:view];
 
-	if (change.sourceAnnotations.count == 0) return;
+	CGPoint delta = (CGPoint){(sourcePoint.x - targetPoint.x), sourcePoint.y - targetPoint.y};
 
-	NSComparisonResult order = [change.sourceLevel compare:change.targetLevel];
-	if (order == NSOrderedSame) return;
+	return CGAffineTransformMakeTranslation(delta.x, delta.y);
+}
 
+- (void)didZoomInWithChange:(SDAnnotationsChange *)change annotationViews:(NSArray *)views
+{
 	[views enumerateObjectsUsingBlock:^(MKAnnotationView *view, NSUInteger idx, BOOL *stop)
 	{
-		[change.sourceAnnotations enumerateObjectsUsingBlock:^(SDQuadTree *annotation, NSUInteger idx, BOOL *stop)
-		{
-			SDQuadTree *target = (id)view.annotation;
-			SDQuadTree *source = annotation;
-			if (order == NSOrderedDescending)
-			{
-				target = source;
-				source = (id)view.annotation;
-			}
+		id <MKAnnotation> target = view.annotation;
 
+		[change.sourceAnnotations enumerateObjectsUsingBlock:^(SDQuadTree *source, NSUInteger i, BOOL *s)
+		{
 			if ([[source class] isSubclassOfClass:SDQuadTree.class] && [source contains:target])
 			{
-				CGPoint sourcePoint = [self convertCoordinate:source.coordinate toPointToView:view.superview];
-				CGPoint targetPoint = [self convertCoordinate:target.coordinate toPointToView:view.superview];
-
-				CGPoint delta = (CGPoint){(sourcePoint.x - targetPoint.x), sourcePoint.y - targetPoint.y};
-
-				[view setTransform:CGAffineTransformMakeTranslation(delta.x, delta.y)];
+				[view setTransform:[self translateTransformFrom:source.coordinate
+															 to:target.coordinate
+													 withinView:view.superview]];
 			}
 		}];
 	}];
@@ -268,10 +296,94 @@ const double  SDMapViewMercatorRadius = 85445659.44705395;
 	}];
 }
 
+- (void)didZoomOutWithChange:(SDAnnotationsChange *)change annotationViews:(NSArray *)views
+{
+	NSUInteger capacity = change.sourceAnnotations.count;
+	NSMutableDictionary *affectedAnnotations = [[NSMutableDictionary alloc] initWithCapacity:capacity];
+
+	NSMutableSet *affectedViews = [[NSMutableSet alloc] initWithCapacity:views.count];
+
+	[views enumerateObjectsUsingBlock:^(MKAnnotationView *view, NSUInteger idx, BOOL *stop)
+	{
+		SDQuadTree *target = (id)view.annotation;
+
+		[change.sourceAnnotations enumerateObjectsUsingBlock:^(SDQuadTree *source, NSUInteger i, BOOL *s)
+		{
+			if (!MKMapRectContainsPoint(self.visibleMapRect, MKMapPointForCoordinate(source.coordinate))) return;
+
+			if ([[target class] isSubclassOfClass:SDQuadTree.class] && [target contains:source])
+			{
+				[affectedViews addObject:view];
+				[view setAlpha:0.f];
+
+				NSValue *key = [NSValue valueWithCLLocationCoordinate2D:target.coordinate];
+				[affectedAnnotations addObject:source toSetForKey:key];
+			}
+		}];
+	}];
+
+	[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
+	{
+		for (id <MKAnnotation> annotation in set)
+		{
+			MKAnnotationView *view = [self viewForAnnotation:annotation];
+			[view setTransform:[self translateTransformFrom:annotation.coordinate
+														 to:[key CLLocationCoordinate2DValue]
+												 withinView:view.superview]];
+		}
+	}];
+
+	[UIView animateWithDuration:0.3 animations:^
+	{
+		[affectedViews enumerateObjectsUsingBlock:^(UIView *view, BOOL *stop)
+		{
+			[view setAlpha:1.f];
+		}];
+
+		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
+		{
+			for (id <MKAnnotation> annotation in set)
+			{
+				MKAnnotationView *view = [self viewForAnnotation:annotation];
+				[view setTransform:[self translateTransformFrom:annotation.coordinate
+															 to:[key CLLocationCoordinate2DValue]
+													 withinView:view.superview]];
+			}
+		}];
+
+	} completion:^(BOOL finished)
+	{
+		[super removeAnnotations:change.sourceAnnotations];
+	}];
+}
+
+- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
+{
+	SDAnnotationsChange *change = [self dequeueChange];
+
+	if (change.sourceAnnotations.count == 0) return;
+
+	switch (change.order)
+	{
+		case NSOrderedAscending:
+			[self didZoomInWithChange:change annotationViews:views];
+			break;
+
+		case NSOrderedDescending:
+			[self didZoomOutWithChange:change annotationViews:views];
+			break;
+
+		default:
+			break;
+	}
+}
+
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
 	NSNumber *previousZoomLevel = @(self.zoomLevel);
+
 	[self updateZoomLevel];
+
 	[self setNeedsUpdateAnnotationsToLevel:@(self.zoomLevel) fromLevel:previousZoomLevel];
 }
 
