@@ -178,9 +178,9 @@ typedef enum
 
 	MKMapPoint centroid = self.centroid;
 	double count = self.count;
-	double newCount = self.count + delta;
-	centroid.x = ((centroid.x * count) + ((double)delta * point.x)) / newCount;
-	centroid.y = ((centroid.y * count)+ ((double)delta * point.y)) / newCount;
+	double endingCount = count + delta;
+	centroid.x = ((centroid.x * count) + ((double)delta * point.x)) / endingCount;
+	centroid.y = ((centroid.y * count)+ ((double)delta * point.y)) / endingCount;
 
 	[self setCentroid:centroid];
 }

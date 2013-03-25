@@ -7,4 +7,6 @@
 
 @interface SDMapView : MKMapView
 
+- (void)setNeedsUpdateAnnotations;
+
 @end

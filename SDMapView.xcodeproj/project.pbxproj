@@ -16,6 +16,7 @@
 		69ED72FA7D68B49E7C32F3B6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED76760FBBD9AD08230C8C /* AppDelegate.m */; };
 		69ED72FB076F49F8536D89D9 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 69ED7EE98FD9DB661B1C1045 /* ViewController_iPhone.xib */; };
 		69ED747474FF0C38E6A87D57 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED76520DA7BCCCCCE4D881 /* main.m */; };
+		69ED74E1A5FD1A481D6CFA12 /* SDDelegateMultiplier.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7DED307595D21096A299 /* SDDelegateMultiplier.m */; };
 		69ED77DC8285B66FFBE055FA /* SDQuadTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED794C334A53C1640CEAC6 /* SDQuadTree.m */; };
 		69ED78B13B911586DFD8DC95 /* SDMapViewCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7852923DF154264D9648 /* SDMapViewCoordinator.m */; };
 		69ED797506D10E245BA926CF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ED75A6AB3819161A9CE824 /* CoreGraphics.framework */; };
@@ -30,6 +31,7 @@
 /* Begin PBXFileReference section */
 		2CBAFB8016FDC2B3005FE437 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		69ED70758CE2A5850C130CEF /* SDQuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDQuadTree.h; sourceTree = "<group>"; };
+		69ED7138D2780CC379985556 /* SDDelegateMultiplier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDDelegateMultiplier.h; sourceTree = "<group>"; };
 		69ED71CCB7CFE84231F50261 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		69ED724A498353350AECD1A4 /* Airport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Airport.m; sourceTree = "<group>"; };
 		69ED73A90B56663776F86FAC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
@@ -52,6 +54,7 @@
 		69ED7C2E27F333C83B343597 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		69ED7C39BA6EAD91D337098F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		69ED7C6A76EAFC4CC0DAC127 /* Airports.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Airports.plist; sourceTree = "<group>"; };
+		69ED7DED307595D21096A299 /* SDDelegateMultiplier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDDelegateMultiplier.m; sourceTree = "<group>"; };
 		69ED7E1A83ED94BC022CE8D9 /* SDMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDMapView.m; sourceTree = "<group>"; };
 		69ED7F374305B0395792CA01 /* SDMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDMapView.h; sourceTree = "<group>"; };
 		69ED7F771E567A57460BBBDD /* Airport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Airport.h; sourceTree = "<group>"; };
@@ -99,6 +102,8 @@
 				69ED769FA1441CC2090067AC /* SDMapViewCoordinator.h */,
 				69ED7E1A83ED94BC022CE8D9 /* SDMapView.m */,
 				69ED7F374305B0395792CA01 /* SDMapView.h */,
+				69ED7DED307595D21096A299 /* SDDelegateMultiplier.m */,
+				69ED7138D2780CC379985556 /* SDDelegateMultiplier.h */,
 			);
 			path = "Map View";
 			sourceTree = "<group>";
@@ -216,6 +221,7 @@
 				69ED78B13B911586DFD8DC95 /* SDMapViewCoordinator.m in Sources */,
 				69ED7F2D2F50E9B943AE1975 /* SDMapView.m in Sources */,
 				69ED7EC2527D208D884C8BB4 /* Airport.m in Sources */,
+				69ED74E1A5FD1A481D6CFA12 /* SDDelegateMultiplier.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
