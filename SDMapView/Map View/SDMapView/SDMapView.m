@@ -218,9 +218,7 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-	NSInvocation *invocation = [NSInvocation invocationForTarget:self
-														selector:@selector(updateAnnotations)
-													   arguments:nil];
+	NSInvocation *invocation = [NSInvocation invocationForTarget:self selector:@selector(updateAnnotations)];
 
 	_updateAnnotationsTimer = [NSTimer scheduledTimerWithTimeInterval:SDMapViewUpdateDelay
 														   invocation:invocation

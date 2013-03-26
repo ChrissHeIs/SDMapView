@@ -3,7 +3,6 @@
 //
 #import "NSInvocation+SDExtension.h"
 
-
 @implementation NSInvocation (SDExtension)
 
 - (void)setArguments:(id)args, ... __attribute__((sentinel))
@@ -23,12 +22,20 @@
 
 + (NSInvocation *)invocationForTarget:(id)target
 							 selector:(SEL)selector
-							arguments:(id)args, ... __attribute__((sentinel))
 {
 	NSMethodSignature *methodSignature = [target methodSignatureForSelector:selector];
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:methodSignature];
 	[invocation setTarget:target];
 	[invocation setSelector:selector];
+
+	return invocation;
+}
+
++ (NSInvocation *)invocationForTarget:(id)target
+							 selector:(SEL)selector
+							arguments:(id)args, ... __attribute__((sentinel))
+{
+	NSInvocation *invocation = [self invocationForTarget:target selector:selector];
 
 	va_list list;
 	va_start(list, args);

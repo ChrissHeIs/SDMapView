@@ -24,7 +24,8 @@ typedef enum
 
 @property (nonatomic) CLLocationCoordinate2D coordinate;
 @property (nonatomic) MKMapPoint centroid;
-- (void)updateCentroidWithPoint:(MKMapPoint)point delta:(NSInteger)delta;
+- (void)updateCentroidWithPoint:(MKMapPoint)point changeType:(SDQuadTreeChangeType)changeType;
+- (NSInteger)annotationDeltaForChangeType:(SDQuadTreeChangeType)changeType;
 
 - (void)processChange:(id <MKAnnotation>)annotation ofType:(SDQuadTreeChangeType)type;
 
@@ -115,6 +116,12 @@ typedef enum
 	};
 }
 
+/**
+* Leaves could be described in next way:
+* 00 | 01
+* 10 | 11
+* It means, that by 'OR' operation we can reach any leave:)
+*/
 - (NSInteger)leaveIndexForAnnotation:(id <MKAnnotation>)annotation
 {
 	MKMapPoint point = MKMapPointForCoordinate(annotation.coordinate);
@@ -124,11 +131,11 @@ typedef enum
 	NSUInteger index = 0;
 	if (MKMapRectGetMidX(self.rect) < point.x)
 	{
-		index |= 1;
+		index |= 1; // | 01
 	}
 	if (MKMapRectGetMidY(self.rect) < point.y)
 	{
-		index |= 2;
+		index |= 2; // | 10
 	}
 
 	return index;
@@ -168,8 +175,20 @@ typedef enum
 	[self setCoordinate:coordinate2D];
 }
 
-- (void)updateCentroidWithPoint:(MKMapPoint)point delta:(NSInteger)delta
+- (NSInteger)annotationDeltaForChangeType:(SDQuadTreeChangeType)changeType
 {
+	switch (changeType)
+	{
+		case SDQuadTreeChangeInsert:	return 1;
+		case SDQuadTreeChangeRemove:	return -1;
+		case SDQuadTreeChangeRemoveAll:	return -self.count;
+	}
+}
+
+- (void)updateCentroidWithPoint:(MKMapPoint)point changeType:(SDQuadTreeChangeType)changeType
+{
+	NSInteger delta = [self annotationDeltaForChangeType:changeType];
+
 	if (self.count + delta <= 0)
 	{
 		[self setCentroid:(MKMapPoint){INFINITY, INFINITY}];
@@ -179,8 +198,11 @@ typedef enum
 	MKMapPoint centroid = self.centroid;
 	double count = self.count;
 	double endingCount = count + delta;
-	centroid.x = ((centroid.x * count) + ((double)delta * point.x)) / endingCount;
-	centroid.y = ((centroid.y * count)+ ((double)delta * point.y)) / endingCount;
+	double sign = delta >= 0 ? 1 : -1;
+	// ((среднее значени * количество) + новое значение) / количество + 1
+	// ((среднее значени * количество) - старое значение) / количество - 1
+	centroid.x = ((centroid.x * count) + (sign * point.x)) / endingCount;
+	centroid.y = ((centroid.y * count)+ (sign * point.y)) / endingCount;
 
 	[self setCentroid:centroid];
 }
@@ -189,16 +211,7 @@ typedef enum
 
 - (void)processChange:(id <MKAnnotation>)annotation ofType:(SDQuadTreeChangeType)type
 {
-	MKMapPoint point = MKMapPointForCoordinate(annotation.coordinate);
-
-	if (type == SDQuadTreeChangeInsert)
-	{
-		[self updateCentroidWithPoint:point delta:1];
-	}
-	else
-	{
-		[self updateCentroidWithPoint:point delta:type == SDQuadTreeChangeRemove ? -1 : self.count];
-	}
+	[self updateCentroidWithPoint:MKMapPointForCoordinate(annotation.coordinate) changeType:type];
 
 	[self updateCount];
 

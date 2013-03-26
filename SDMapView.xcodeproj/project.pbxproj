@@ -46,6 +46,7 @@
 		69ED724B5929CDCAE303BA9A /* SDDescendingMapTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDDescendingMapTransaction.m; sourceTree = "<group>"; };
 		69ED739511DBA23CE8B9E77A /* NSMutableDictionary+SetInsertion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+SetInsertion.h"; sourceTree = "<group>"; };
 		69ED73A90B56663776F86FAC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
+		69ED73C7C2662324D12860C4 /* SDAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDAnnotation.h; sourceTree = "<group>"; };
 		69ED73EFC050DD2798A237C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
 		69ED74088C04EA4E7A509B12 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		69ED742F6EF20E246EBB1170 /* SDAscendingMapTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDAscendingMapTransaction.h; sourceTree = "<group>"; };
@@ -130,6 +131,7 @@
 				69ED7FF311BFF88F1F8E9D3D /* Transactions Factory */,
 				69ED796FDBA26001605E763F /* SDMapView */,
 				69ED7F69D7EC482CD1F1BA95 /* Utils */,
+				69ED73C7C2662324D12860C4 /* SDAnnotation.h */,
 			);
 			path = "Map View";
 			sourceTree = "<group>";

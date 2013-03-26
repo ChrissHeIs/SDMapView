@@ -6,6 +6,8 @@
 #import <MapKit/MKGeometry.h>
 #import <MapKit/MKAnnotation.h>
 
+#import "SDAnnotation.h"
+
 #define SDQUADTREE_TRIM_EMPTY_BRANCH 1
 
 /**
@@ -14,7 +16,7 @@
 */
 static const NSUInteger SDQuadTreeAnnotationsLimit = 1;
 
-@interface SDQuadTree : NSObject <MKAnnotation>
+@interface SDQuadTree : NSObject <SDAnnotation>
 
 - (id)initWithRect:(MKMapRect)rect maxDepth:(NSUInteger)maxDepth;
 

@@ -8,6 +8,9 @@
 - (void)setArguments:(id)args, ... __attribute__((sentinel));
 
 + (NSInvocation *)invocationForTarget:(id)target
+							 selector:(SEL)selector;
+
++ (NSInvocation *)invocationForTarget:(id)target
 							 selector:(SEL)selector
 							arguments:(id)args, ... __attribute__((sentinel));
 
