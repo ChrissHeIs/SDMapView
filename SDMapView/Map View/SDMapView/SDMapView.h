@@ -5,8 +5,12 @@
 
 #import <MapKit/MKMapView.h>
 
+@class SDMapTransactionFactory;
+
 @interface SDMapView : MKMapView
 
 - (void)setNeedsUpdateAnnotations;
+
+@property (nonatomic, strong) SDMapTransactionFactory *transactionFactory;
 
 @end
