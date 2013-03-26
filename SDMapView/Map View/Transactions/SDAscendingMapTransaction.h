@@ -1,10 +1,11 @@
 //
 // Created by dmitriy on 26.03.13.
 //
-#import "SDRegularMapTransaction.h"
+#import "SDMapTransaction.h"
 
-@interface SDAscendingMapTransaction : SDRegularMapTransaction
+@interface SDAscendingMapTransaction : SDMapTransaction
 
-
+- (void)invokeWithMapView:(SDMapView *)mapView;
+- (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views;
 
 @end

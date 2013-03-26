@@ -4,11 +4,9 @@
 
 #import "SDDescendingMapTransaction.h"
 #import "SDMapView.h"
-#import "SDQuadTree.h"
-#import "NSValue+CLLocationCoordinate2D.h"
-#import "NSMutableDictionary+SetInsertion.h"
-#import "MKMapView+SDTransforms.h"
 #import "SDMapView+SDMapTransaction.h"
+
+const NSTimeInterval _SDDescendingMapTransactionDuration = 0.2;
 
 @implementation SDDescendingMapTransaction
 
@@ -21,57 +19,32 @@
 {
 	[mapView lockForTransaction:self];
 
-	NSUInteger capacity = views.count;
-	NSMutableDictionary *affectedAnnotations = [[NSMutableDictionary alloc] initWithCapacity:capacity];
-
-	NSMutableSet *affectedViews = [[NSMutableSet alloc] initWithCapacity:self.source.count];
-
-	[views enumerateObjectsUsingBlock:^(MKAnnotationView *view, NSUInteger idx, BOOL *stop)
+	NSMutableSet *removingViews = [[NSMutableSet alloc] initWithCapacity:self.source.count];
+	[self.source enumerateObjectsUsingBlock:^(id <MKAnnotation> obj, BOOL *stop)
 	{
-		SDQuadTree *target = (id)view.annotation;
-
-		[self.source enumerateObjectsUsingBlock:^(SDQuadTree *source, BOOL *s)
+		UIView *view = [mapView viewForAnnotation:obj];
+		if (view != nil)
 		{
-			if (!MKMapRectContainsPoint(mapView.visibleMapRect, MKMapPointForCoordinate(source.coordinate))) return;
-
-			if ([[target class] isSubclassOfClass:SDQuadTree.class] && [target contains:source])
-			{
-				[affectedViews addObject:view];
-				[view setAlpha:0.f];
-
-				NSValue *key = [NSValue valueWithCLLocationCoordinate2D:target.coordinate];
-				[affectedAnnotations addObject:source toSetForKey:key];
-			}
-		}];
+			[removingViews addObject:view];
+		}
 	}];
 
-	[UIView animateWithDuration:0.3 animations:^
-	{
-		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
-		{
-			for (id <MKAnnotation> annotation in set)
-			{
-				MKAnnotationView *view = [mapView viewForAnnotation:annotation];
-				[view setTransform:[mapView translateTransformFrom:annotation.coordinate
-																to:[key CLLocationCoordinate2DValue]
-														withinView:view.superview]];
-			}
-		}];
+	[views makeObjectsPerformSelector:@selector(setAlpha:) withObject:nil];
 
-		[affectedViews enumerateObjectsUsingBlock:^(UIView *view, BOOL *stop)
+	[UIView animateWithDuration:_SDDescendingMapTransactionDuration animations:^
+	{
+		[removingViews makeObjectsPerformSelector:@selector(setAlpha:) withObject:nil];
+
+		[views enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, BOOL *stop)
 		{
 			[view setAlpha:1.f];
 		}];
 
 	} completion:^(BOOL finished)
 	{
-		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
+		[removingViews enumerateObjectsUsingBlock:^(UIView *view, BOOL *stop)
 		{
-			for (id <MKAnnotation> annotation in set)
-			{
-				MKAnnotationView *view = [mapView viewForAnnotation:annotation];
-				[view setTransform:CGAffineTransformIdentity];
-			}
+			[view setAlpha:1.f];
 		}];
 
 		[mapView removeAnnotations:[self.source allObjects] withinTransaction:self];

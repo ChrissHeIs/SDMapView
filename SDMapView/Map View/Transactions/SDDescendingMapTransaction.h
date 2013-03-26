@@ -6,5 +6,6 @@
 @interface SDDescendingMapTransaction : SDMapTransaction
 
 - (void)invokeWithMapView:(SDMapView *)mapView;
+- (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views;
 
 @end

@@ -9,7 +9,15 @@
 #import "SDMapView.h"
 #import "SDMapView+SDMapTransaction.h"
 
+const NSTimeInterval _SDAscendingMapTransactionDuration = 0.2;
+
 @implementation SDAscendingMapTransaction
+
+- (void)invokeWithMapView:(SDMapView *)mapView
+{
+	[mapView removeAnnotations:[self.source allObjects] withinTransaction:self];
+	[mapView addAnnotations:[self.target allObjects] withinTransaction:self];
+}
 
 - (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
@@ -30,7 +38,7 @@
 		}];
 	}];
 
-	[UIView animateWithDuration:0.3 animations:^
+	[UIView animateWithDuration:_SDAscendingMapTransactionDuration animations:^
 	{
 		[views enumerateObjectsUsingBlock:^(MKAnnotationView *view, NSUInteger idx, BOOL *stop)
 		{
