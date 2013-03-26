@@ -35,11 +35,11 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 - (void)confirmTransactionActions:(SDMapTransaction *)transaction;
 
 @property (nonatomic) NSUInteger annotationsLevel;
-- (void)updateAnnotationsToLevel:(NSNumber *)toLevel;
+
+- (void)updateAnnotations;
 
 
-@property (nonatomic) NSUInteger zoomLevel;
-- (void)updateZoomLevel;
+@property (nonatomic, readonly) NSUInteger zoomLevel;
 
 @end
 
@@ -57,7 +57,6 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	[self setTransactionFactory:[SDMapTransactionFactory new]];
 
 	[self setAnnotationsLevel:NSUIntegerMax];
-	[self updateZoomLevel];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
@@ -101,15 +100,13 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 #pragma mark - Zoom Level
 
-- (void)updateZoomLevel
+- (NSUInteger)zoomLevel
 {
 	CLLocationDegrees longitudeDelta = self.region.span.longitudeDelta;
 	CGFloat mapWidthInPixels = self.bounds.size.width;
 
 	double zoomScale = longitudeDelta * SDMapViewMercatorRadius * M_PI / (180.0 * mapWidthInPixels);
-	NSUInteger zoomLevel = (NSUInteger)ceil(SDMapViewMaxZoomLevel - log2(zoomScale));
-
-	[self setZoomLevel:MAX(0, zoomLevel)];
+	return (NSUInteger)ceil(SDMapViewMaxZoomLevel - log2(zoomScale));
 }
 
 #pragma mark - Transactions
@@ -134,11 +131,15 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	return _annotationsLevel;
 }
 
-- (void)updateAnnotationsToLevel:(NSNumber *)toLevel
+- (void)updateAnnotations
 {
-	NSParameterAssert(toLevel != nil);
-
-	if ([self isLockedForTransaction]) return;
+	if ([self isLockedForTransaction])
+	{
+#ifdef DEBUG
+		NSLog(@"Ignore transaction");
+#endif
+		return;
+	}
 
 	MKMapRect rect = self.visibleMapRect;
 	if (rect.origin.x + 10.0 > MKMapRectWorld.size.width)
@@ -146,7 +147,7 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 		rect.origin.x = 0.0;
 	}
 
-	NSUInteger level = [toLevel unsignedIntegerValue];
+	NSUInteger level = [self zoomLevel];
 	NSSet *targetAnnotations = [self.tree annotationsInRect:rect maxTraversalDepth:level];
 	NSMutableSet *sourceAnnotations = [[NSMutableSet alloc] initWithArray:[super annotations]];
 
@@ -161,7 +162,7 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 	SDMapTransaction *transaction = [self.transactionFactory transactionWithTarget:targetAnnotations
 																			source:sourceAnnotations
-																	   targetLevel:toLevel
+																	   targetLevel:@(level)
 																	   sourceLevel:@(self.annotationsLevel)];
 	[self setActiveTransaction:transaction];
 	[self processTransaction:transaction];
@@ -177,9 +178,9 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)setNeedsUpdateAnnotations
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateAnnotationsToLevel:) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateAnnotations) object:nil];
 
-	[self performSelector:@selector(updateAnnotationsToLevel:)
+	[self performSelector:@selector(updateAnnotations)
 			   withObject:@(self.zoomLevel)
 			   afterDelay:0.0
 				  inModes:@[NSRunLoopCommonModes]];
@@ -217,14 +218,13 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-	[self updateZoomLevel];
-
 	NSInvocation *invocation = [NSInvocation invocationForTarget:self
-														selector:@selector(updateAnnotationsToLevel:)
-													   arguments:@(self.zoomLevel), nil];
+														selector:@selector(updateAnnotations)
+													   arguments:nil];
 
-	_updateAnnotationsTimer = [NSTimer timerWithTimeInterval:SDMapViewUpdateDelay invocation:invocation repeats:NO];
-	[[NSRunLoop currentRunLoop] addTimer:_updateAnnotationsTimer forMode:NSRunLoopCommonModes];
+	_updateAnnotationsTimer = [NSTimer scheduledTimerWithTimeInterval:SDMapViewUpdateDelay
+														   invocation:invocation
+															  repeats:NO];
 }
 
 #pragma mark - MKMapView
