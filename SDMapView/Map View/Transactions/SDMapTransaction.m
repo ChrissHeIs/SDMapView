@@ -32,12 +32,12 @@
 
 - (void)invokeWithMapView:(SDMapView *)mapView
 {
-	[NSException raise:@"Subclass error" format:@"Subclass should override %@" arguments:NSStringFromSelector(_cmd)];
+	[NSException raise:@"Subclass error" format:@"Subclass should override %@", NSStringFromSelector(_cmd)];
 }
 
 - (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
-	[NSException raise:@"Subclass error" format:@"Subclass should override %@" arguments:NSStringFromSelector(_cmd)];
+	[NSException raise:@"Subclass error" format:@"Subclass should override %@", NSStringFromSelector(_cmd)];
 }
 
 @end
