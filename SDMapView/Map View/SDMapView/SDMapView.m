@@ -23,6 +23,8 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	SDDelegateMultiplier *_delegateMultiplier;
 
 	__weak NSTimer *_updateAnnotationsTimer;
+
+	SDMapTransaction *_lockTransaction;
 }
 
 - (void)commonInitialization;
@@ -51,6 +53,8 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	[super setDelegate:(id)_delegateMultiplier];
 
 	[self setTree:[[SDQuadTree alloc] initWithRect:MKMapRectWorld maxDepth:SDMapViewMaxZoomLevel]];
+
+	[self setTransactionFactory:[SDMapTransactionFactory new]];
 
 	[self setAnnotationsLevel:NSUIntegerMax];
 	[self updateZoomLevel];
@@ -82,8 +86,6 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)setDelegate:(id <MKMapViewDelegate>)delegate
 {
-	return;
-
 	if (_targetDelegate != nil)
 	{
 		[_delegateMultiplier removeTarget:_targetDelegate];
@@ -126,7 +128,7 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 {
 	NSParameterAssert(toLevel != nil);
 
-	if (self.activeTransaction != nil) return;
+	if ([self isLockedForTransaction]) return;
 
 	MKMapRect rect = self.visibleMapRect;
 	if (rect.origin.x + 10.0 > MKMapRectWorld.size.width)
@@ -157,12 +159,10 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)processTransaction:(SDMapTransaction *)transaction
 {
-	[transaction invokeWithMapView:self];
+	NSParameterAssert(transaction != nil);
 
-	if (self.activeTransaction == nil)
-	{
-		NSLog(@"TRANSACTION NIL");
-	}
+	[self setAnnotationsLevel:[transaction.targetLevel unsignedIntegerValue]];
+	[transaction invokeWithMapView:self];
 }
 
 - (void)setNeedsUpdateAnnotations
@@ -195,14 +195,22 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
+	if ([self isLockedForTransaction])
+	{
+		NSParameterAssert([self isLockedForTransaction:self.activeTransaction]);
+	}
+
 	[self.activeTransaction mapView:self didAddAnnotationViews:views];
+}
+
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
+{
+	[_updateAnnotationsTimer invalidate];
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
 	[self updateZoomLevel];
-
-	[_updateAnnotationsTimer invalidate];
 
 	NSInvocation *invocation = [NSInvocation invocationForTarget:self
 														selector:@selector(updateAnnotationsToLevel:)
@@ -275,6 +283,35 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 - (void)performRemoveAnnotations:(NSArray *)annotations
 {
 	[super removeAnnotations:annotations];
+}
+
+#pragma mark - Transactions
+
+- (BOOL)isLockedForTransaction
+{
+	return _lockTransaction != nil;
+}
+
+- (BOOL)isLockedForTransaction:(SDMapTransaction *)transaction
+{
+	if (![self isLockedForTransaction]) return NO;
+
+	return _lockTransaction == transaction;
+}
+
+- (void)lockForTransaction:(SDMapTransaction *)transaction
+{
+	NSParameterAssert(_lockTransaction == nil);
+
+	_lockTransaction = transaction;
+}
+
+- (void)unlockForTransaction:(SDMapTransaction *)transaction
+{
+	NSParameterAssert(transaction != nil);
+	NSParameterAssert(_lockTransaction == transaction);
+
+	_lockTransaction = nil;
 }
 
 @end

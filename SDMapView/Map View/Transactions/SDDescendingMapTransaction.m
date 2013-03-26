@@ -4,73 +4,82 @@
 
 #import "SDDescendingMapTransaction.h"
 #import "SDMapView.h"
+#import "SDQuadTree.h"
+#import "NSValue+CLLocationCoordinate2D.h"
+#import "NSMutableDictionary+SetInsertion.h"
+#import "MKMapView+SDTransforms.h"
+#import "SDMapView+Package.h"
 
 @implementation SDDescendingMapTransaction
 
 - (void)invokeWithMapView:(SDMapView *)mapView
 {
-	[mapView removeAnnotations:[self.source allObjects]];
-	[mapView addAnnotations:[self.target allObjects]];
+	[mapView performAddAnnotations:[self.target allObjects]];
 }
 
 - (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
-	//	NSUInteger capacity = change.sourceAnnotations.count;
-//	NSMutableDictionary *affectedAnnotations = [[NSMutableDictionary alloc] initWithCapacity:capacity];
-//
-//	NSMutableSet *affectedViews = [[NSMutableSet alloc] initWithCapacity:views.count];
-//
-//	[views enumerateObjectsUsingBlock:^(MKAnnotationView *view, NSUInteger idx, BOOL *stop)
-//	{
-//		SDQuadTree *target = (id)view.annotation;
-//
-//		[change.sourceAnnotations enumerateObjectsUsingBlock:^(SDQuadTree *source, NSUInteger i, BOOL *s)
-//		{
-//			if (!MKMapRectContainsPoint(self.visibleMapRect, MKMapPointForCoordinate(source.coordinate))) return;
-//
-//			if ([[target class] isSubclassOfClass:SDQuadTree.class] && [target contains:source])
-//			{
-//				[affectedViews addObject:view];
-//				[view setAlpha:0.f];
-//
-//				NSValue *key = [NSValue valueWithCLLocationCoordinate2D:target.coordinate];
-//				[affectedAnnotations addObject:source toSetForKey:key];
-//			}
-//		}];
-//	}];
-//
-//	[UIView animateWithDuration:0.3 animations:^
-//	{
-//		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
-//		{
-//			for (id <MKAnnotation> annotation in set)
-//			{
-//				MKAnnotationView *view = [self viewForAnnotation:annotation];
-//				[view setTransform:[self translateTransformFrom:annotation.coordinate
-//															 to:[key CLLocationCoordinate2DValue]
-//													 withinView:view.superview]];
-//			}
-//		}];
-//
-//	} completion:^(BOOL finished)
-//	{
-//
-//		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
-//		{
-//			for (id <MKAnnotation> annotation in set)
-//			{
-//				MKAnnotationView *view = [self viewForAnnotation:annotation];
-//				[view setTransform:CGAffineTransformIdentity];
-//			}
-//		}];
-//
-//		[super removeAnnotations:change.sourceAnnotations];
-//
-//		[affectedViews enumerateObjectsUsingBlock:^(UIView *view, BOOL *stop)
-//		{
-//			[view setAlpha:1.f];
-//		}];
-//	}];
+	[mapView lockForTransaction:self];
+
+	NSUInteger capacity = views.count;
+	NSMutableDictionary *affectedAnnotations = [[NSMutableDictionary alloc] initWithCapacity:capacity];
+
+	NSMutableSet *affectedViews = [[NSMutableSet alloc] initWithCapacity:self.source.count];
+
+	[views enumerateObjectsUsingBlock:^(MKAnnotationView *view, NSUInteger idx, BOOL *stop)
+	{
+		SDQuadTree *target = (id)view.annotation;
+
+		[self.source enumerateObjectsUsingBlock:^(SDQuadTree *source, BOOL *s)
+		{
+			if (!MKMapRectContainsPoint(mapView.visibleMapRect, MKMapPointForCoordinate(source.coordinate))) return;
+
+			if ([[target class] isSubclassOfClass:SDQuadTree.class] && [target contains:source])
+			{
+				[affectedViews addObject:view];
+				[view setAlpha:0.f];
+
+				NSValue *key = [NSValue valueWithCLLocationCoordinate2D:target.coordinate];
+				[affectedAnnotations addObject:source toSetForKey:key];
+			}
+		}];
+	}];
+
+	[UIView animateWithDuration:0.3 animations:^
+	{
+		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
+		{
+			for (id <MKAnnotation> annotation in set)
+			{
+				MKAnnotationView *view = [mapView viewForAnnotation:annotation];
+				[view setTransform:[mapView translateTransformFrom:annotation.coordinate
+																to:[key CLLocationCoordinate2DValue]
+														withinView:view.superview]];
+			}
+		}];
+
+		[affectedViews enumerateObjectsUsingBlock:^(UIView *view, BOOL *stop)
+		{
+			[view setAlpha:1.f];
+		}];
+
+	} completion:^(BOOL finished)
+	{
+		NSLog(@"Finished => %d", finished);
+
+		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
+		{
+			for (id <MKAnnotation> annotation in set)
+			{
+				MKAnnotationView *view = [mapView viewForAnnotation:annotation];
+				[view setTransform:CGAffineTransformIdentity];
+			}
+		}];
+
+		[mapView performRemoveAnnotations:[self.source allObjects]];
+
+		[mapView unlockForTransaction:self];
+	}];
 }
 
 @end

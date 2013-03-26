@@ -76,7 +76,6 @@
 		69ED7C13D8BFE31F5C98DC39 /* NSValue+CLLocationCoordinate2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSValue+CLLocationCoordinate2D.m"; sourceTree = "<group>"; };
 		69ED7C2E27F333C83B343597 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		69ED7C39BA6EAD91D337098F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		69ED7C55C5DAFACD1210C63B /* SDMapTransactionUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDMapTransactionUtility.h; sourceTree = "<group>"; };
 		69ED7C6A76EAFC4CC0DAC127 /* Airports.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Airports.plist; sourceTree = "<group>"; };
 		69ED7C9E5E592F4DAFBB7C5D /* SDAscendingMapTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDAscendingMapTransaction.m; sourceTree = "<group>"; };
 		69ED7CAAA2A318361606AE4F /* MKMapView+SDTransforms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+SDTransforms.m"; sourceTree = "<group>"; };
@@ -224,7 +223,6 @@
 				69ED742F6EF20E246EBB1170 /* SDAscendingMapTransaction.h */,
 				69ED724B5929CDCAE303BA9A /* SDDescendingMapTransaction.m */,
 				69ED7DA943DD0C8C78ABDC38 /* SDDescendingMapTransaction.h */,
-				69ED7C55C5DAFACD1210C63B /* SDMapTransactionUtility.h */,
 			);
 			path = Transactions;
 			sourceTree = "<group>";

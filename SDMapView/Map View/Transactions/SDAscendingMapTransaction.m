@@ -7,11 +7,14 @@
 #import "SDAscendingMapTransaction.h"
 #import "MKMapView+SDTransforms.h"
 #import "SDMapView.h"
+#import "SDMapView+Package.h"
 
 @implementation SDAscendingMapTransaction
 
 - (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
+	[mapView lockForTransaction:self];
+
 	[views enumerateObjectsUsingBlock:^(MKAnnotationView *view, NSUInteger idx, BOOL *stop)
 	{
 		id <MKAnnotation> target = view.annotation;
@@ -36,7 +39,7 @@
 
 	} completion:^(BOOL finished)
 	{
-		NSLog(@"FINISHED => %d", finished);
+		[mapView unlockForTransaction:self];
 	}];
 }
 

@@ -32,10 +32,10 @@
 			break;
 	}
 
-	return [[SDRegularMapTransaction alloc] initWithTarget:target
-													source:source
-											   targetLevel:targetLevel
-											   sourceLevel:sourceLevel];
+	return [[transactionClass alloc] initWithTarget:target
+											 source:source
+										targetLevel:targetLevel
+										sourceLevel:sourceLevel];
 }
 
 

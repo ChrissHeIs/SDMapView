@@ -41,7 +41,6 @@
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
 {
-	NSLog(@"%@", mapView);
 }
 
 @end
