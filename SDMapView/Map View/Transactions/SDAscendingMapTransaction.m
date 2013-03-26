@@ -7,7 +7,7 @@
 #import "SDAscendingMapTransaction.h"
 #import "MKMapView+SDTransforms.h"
 #import "SDMapView.h"
-#import "SDMapView+Package.h"
+#import "SDMapView+SDMapTransaction.h"
 
 @implementation SDAscendingMapTransaction
 

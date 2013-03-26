@@ -3,14 +3,14 @@
 //
 #import "SDRegularMapTransaction.h"
 
-#import "SDMapView+Package.h"
+#import "SDMapView+SDMapTransaction.h"
 
 @implementation SDRegularMapTransaction
 
 - (void)invokeWithMapView:(SDMapView *)mapView
 {
-	[mapView performRemoveAnnotations:[self.source allObjects]];
-	[mapView performAddAnnotations:[self.target allObjects]];
+	[mapView removeAnnotations:[self.source allObjects] withinTransaction:self];
+	[mapView addAnnotations:[self.target allObjects] withinTransaction:self];
 }
 
 @end

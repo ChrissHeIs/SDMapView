@@ -8,13 +8,13 @@
 #import "NSValue+CLLocationCoordinate2D.h"
 #import "NSMutableDictionary+SetInsertion.h"
 #import "MKMapView+SDTransforms.h"
-#import "SDMapView+Package.h"
+#import "SDMapView+SDMapTransaction.h"
 
 @implementation SDDescendingMapTransaction
 
 - (void)invokeWithMapView:(SDMapView *)mapView
 {
-	[mapView performAddAnnotations:[self.target allObjects]];
+	[mapView addAnnotations:[self.target allObjects] withinTransaction:self];
 }
 
 - (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views
@@ -65,8 +65,6 @@
 
 	} completion:^(BOOL finished)
 	{
-		NSLog(@"Finished => %d", finished);
-
 		[affectedAnnotations enumerateKeysAndObjectsUsingBlock:^(NSValue *key, NSMutableSet *set, BOOL *stop)
 		{
 			for (id <MKAnnotation> annotation in set)
@@ -76,8 +74,7 @@
 			}
 		}];
 
-		[mapView performRemoveAnnotations:[self.source allObjects]];
-
+		[mapView removeAnnotations:[self.source allObjects] withinTransaction:self];
 		[mapView unlockForTransaction:self];
 	}];
 }

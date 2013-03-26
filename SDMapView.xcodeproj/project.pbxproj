@@ -60,7 +60,7 @@
 		69ED771CC3BD605270F51EAE /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		69ED773B56177261B85CDF84 /* NSInvocation+SDExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSInvocation+SDExtension.h"; sourceTree = "<group>"; };
 		69ED7751B1F525FE8EC09CE8 /* NSMutableDictionary+SetInsertion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableDictionary+SetInsertion.m"; sourceTree = "<group>"; };
-		69ED77D534E5F7EFCE58BCE4 /* SDMapView+Package.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SDMapView+Package.h"; sourceTree = "<group>"; };
+		69ED77D534E5F7EFCE58BCE4 /* SDMapView+SDMapTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SDMapView+SDMapTransaction.h"; sourceTree = "<group>"; };
 		69ED780138C5E062CA6D6B44 /* SDMapTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDMapTransaction.m; sourceTree = "<group>"; };
 		69ED783D4CE7230D18F77294 /* SDMapTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDMapTransaction.h; sourceTree = "<group>"; };
 		69ED78431E041FD3CCC9401D /* SDMapTransactionFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDMapTransactionFactory.h; sourceTree = "<group>"; };
@@ -196,7 +196,7 @@
 		69ED796FDBA26001605E763F /* SDMapView */ = {
 			isa = PBXGroup;
 			children = (
-				69ED77D534E5F7EFCE58BCE4 /* SDMapView+Package.h */,
+				69ED77D534E5F7EFCE58BCE4 /* SDMapView+SDMapTransaction.h */,
 				69ED7F757062D7D9415BE6AA /* SDMapView.h */,
 				69ED7EA101E3A60D61AD77B5 /* SDMapView.m */,
 			);

@@ -2,7 +2,7 @@
 // Created by dmitriy on 24.03.13.
 //
 #import "SDMapView.h"
-#import "SDMapView+Package.h"
+#import "SDMapView+SDMapTransaction.h"
 
 #import <MapKit/MapKit.h>
 
@@ -32,7 +32,7 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 @property (nonatomic, strong) SDQuadTree *tree;
 @property (nonatomic, weak) SDMapTransaction *activeTransaction;
 - (void)processTransaction:(SDMapTransaction *)transaction;
-
+- (void)confirmTransactionActions:(SDMapTransaction *)transaction;
 
 @property (nonatomic) NSUInteger annotationsLevel;
 - (void)updateAnnotationsToLevel:(NSNumber *)toLevel;
@@ -110,6 +110,16 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	NSUInteger zoomLevel = (NSUInteger)ceil(SDMapViewMaxZoomLevel - log2(zoomScale));
 
 	[self setZoomLevel:MAX(0, zoomLevel)];
+}
+
+#pragma mark - Transactions
+
+- (void)confirmTransactionActions:(SDMapTransaction *)transaction
+{
+	if ([self isLockedForTransaction])
+	{
+		NSParameterAssert([self isLockedForTransaction:transaction]);
+	}
 }
 
 #pragma mark - Annotations Update
@@ -195,10 +205,7 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
-	if ([self isLockedForTransaction])
-	{
-		NSParameterAssert([self isLockedForTransaction:self.activeTransaction]);
-	}
+	[self confirmTransactionActions:self.activeTransaction];
 
 	[self.activeTransaction mapView:self didAddAnnotationViews:views];
 }
@@ -263,25 +270,33 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 @end
 
-@implementation SDMapView (Package)
+@implementation SDMapView (SDMapTransaction)
 
-- (void)performAddAnnotation:(id <MKAnnotation>)annotation
+- (void)addAnnotation:(id <MKAnnotation>)annotation withinTransaction:(SDMapTransaction *)transaction
 {
+	[self confirmTransactionActions:transaction];
+
 	[super addAnnotation:annotation];
 }
 
-- (void)performAddAnnotations:(NSArray *)annotations
+- (void)addAnnotations:(NSArray *)annotations withinTransaction:(SDMapTransaction *)transaction
 {
+	[self confirmTransactionActions:transaction];
+
 	[super addAnnotations:annotations];
 }
 
-- (void)performRemoveAnnotation:(id <MKAnnotation>)annotation
+- (void)removeAnnotation:(id <MKAnnotation>)annotation withinTransaction:(SDMapTransaction *)transaction
 {
+	[self confirmTransactionActions:transaction];
+
 	[super removeAnnotation:annotation];
 }
 
-- (void)performRemoveAnnotations:(NSArray *)annotations
+- (void)removeAnnotations:(NSArray *)annotations withinTransaction:(SDMapTransaction *)transaction
 {
+	[self confirmTransactionActions:transaction];
+
 	[super removeAnnotations:annotations];
 }
 
