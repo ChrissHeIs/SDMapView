@@ -21,7 +21,6 @@
 		69ED74749C7EC519BE42559A /* NSValue+CLLocationCoordinate2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7C13D8BFE31F5C98DC39 /* NSValue+CLLocationCoordinate2D.m */; };
 		69ED773A99DFB7BECC40CB46 /* MKMapView+SDTransforms.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7CAAA2A318361606AE4F /* MKMapView+SDTransforms.m */; };
 		69ED778DA90BC4A6C6BE6CF1 /* NSMutableDictionary+SetInsertion.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7751B1F525FE8EC09CE8 /* NSMutableDictionary+SetInsertion.m */; };
-		69ED77FA30B1110F7104BB73 /* SDDelegateMultiplier.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7E28DBB059BF389F6BF3 /* SDDelegateMultiplier.m */; };
 		69ED79631F2664C45D855938 /* SDMapTransactionFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7B3EB1DF2B11F4627D68 /* SDMapTransactionFactory.m */; };
 		69ED7963D80BC59FB0EEA020 /* SDQuadTree.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED7A6BE439148A76A7C631 /* SDQuadTree.m */; };
 		69ED797506D10E245BA926CF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 69ED75A6AB3819161A9CE824 /* CoreGraphics.framework */; };
@@ -55,7 +54,6 @@
 		69ED7640B65F6DE1E11689DE /* SDMapView-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.info; path = "SDMapView-Info.plist"; sourceTree = "<group>"; };
 		69ED76520DA7BCCCCCE4D881 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		69ED76760FBBD9AD08230C8C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		69ED7687A07B9F953D76846F /* SDDelegateMultiplier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDDelegateMultiplier.h; sourceTree = "<group>"; };
 		69ED76A96CD7FAD781E672EF /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		69ED76CE0B997FAC2466941F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		69ED771CC3BD605270F51EAE /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
@@ -82,7 +80,6 @@
 		69ED7CAAA2A318361606AE4F /* MKMapView+SDTransforms.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MKMapView+SDTransforms.m"; sourceTree = "<group>"; };
 		69ED7D7A52AEDDB105376272 /* SDQuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDQuadTree.h; sourceTree = "<group>"; };
 		69ED7DA943DD0C8C78ABDC38 /* SDDescendingMapTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDDescendingMapTransaction.h; sourceTree = "<group>"; };
-		69ED7E28DBB059BF389F6BF3 /* SDDelegateMultiplier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDDelegateMultiplier.m; sourceTree = "<group>"; };
 		69ED7EA101E3A60D61AD77B5 /* SDMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDMapView.m; sourceTree = "<group>"; };
 		69ED7F757062D7D9415BE6AA /* SDMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDMapView.h; sourceTree = "<group>"; };
 		69ED7F771E567A57460BBBDD /* Airport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Airport.h; sourceTree = "<group>"; };
@@ -130,7 +127,6 @@
 				69ED79547E930031E1444AAA /* Quad Tree */,
 				69ED7FF311BFF88F1F8E9D3D /* Transactions Factory */,
 				69ED796FDBA26001605E763F /* SDMapView */,
-				69ED7F69D7EC482CD1F1BA95 /* Utils */,
 				69ED73C7C2662324D12860C4 /* SDAnnotation.h */,
 			);
 			path = "Map View";
@@ -211,15 +207,6 @@
 				69ED71E5CAF129736264FBCC /* Frameworks */,
 				69ED70EA16BBFAFB805882FD /* SDMapView */,
 			);
-			sourceTree = "<group>";
-		};
-		69ED7F69D7EC482CD1F1BA95 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				69ED7687A07B9F953D76846F /* SDDelegateMultiplier.h */,
-				69ED7E28DBB059BF389F6BF3 /* SDDelegateMultiplier.m */,
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 		69ED7FF176D9B24CCD26686B /* Transactions */ = {
@@ -325,7 +312,6 @@
 				69ED79631F2664C45D855938 /* SDMapTransactionFactory.m in Sources */,
 				69ED7F3D5BE8FF250487EA33 /* SDMapView.m in Sources */,
 				69ED773A99DFB7BECC40CB46 /* MKMapView+SDTransforms.m in Sources */,
-				69ED77FA30B1110F7104BB73 /* SDDelegateMultiplier.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

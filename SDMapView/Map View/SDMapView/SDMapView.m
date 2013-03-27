@@ -7,7 +7,6 @@
 #import <MapKit/MapKit.h>
 
 #import "SDQuadTree.h"
-#import "SDDelegateMultiplier.h"
 #import "SDMapTransactionFactory.h"
 
 #import "NSInvocation+SDExtension.h"
@@ -19,13 +18,22 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 @interface SDMapView () <MKMapViewDelegate>
 {
+	struct
+	{
+		BOOL viewForAnnotation : 1;
+		BOOL didAddAnnotationViews : 1;
+		BOOL regionWillChangeAnimated : 1;
+		BOOL regionDidChangeAnimated : 1;
+	} _delegateFlags;
+
 	__weak id <MKMapViewDelegate> _targetDelegate;
-	SDDelegateMultiplier *_delegateMultiplier;
 
 	__weak NSTimer *_updateAnnotationsTimer;
 
 	SDMapTransaction *_lockTransaction;
 }
+
+- (void)configureDelegateFlags;
 
 - (void)commonInitialization;
 
@@ -49,14 +57,13 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (void)commonInitialization
 {
-	_delegateMultiplier = [[SDDelegateMultiplier alloc] initWithTargets:@[self]];
-	[super setDelegate:(id)_delegateMultiplier];
-
 	[self setTree:[[SDQuadTree alloc] initWithRect:MKMapRectWorld maxDepth:SDMapViewMaxZoomLevel]];
 
 	[self setTransactionFactory:[SDMapTransactionFactory new]];
 
 	[self setAnnotationsLevel:NSUIntegerMax];
+
+	[super setDelegate:self];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
@@ -83,18 +90,53 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 #pragma mark - Message Forwarding
 
+- (void)configureDelegateFlags
+{
+	_delegateFlags.didAddAnnotationViews = [_targetDelegate respondsToSelector:@selector(mapView:didAddAnnotationViews:)];
+	_delegateFlags.viewForAnnotation = [_targetDelegate respondsToSelector:@selector(mapView:viewForAnnotation:)];
+	_delegateFlags.regionWillChangeAnimated = [_targetDelegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)];
+	_delegateFlags.regionDidChangeAnimated = [_targetDelegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)];
+}
+
 - (void)setDelegate:(id <MKMapViewDelegate>)delegate
 {
-	if (_targetDelegate != nil)
-	{
-		[_delegateMultiplier removeTarget:_targetDelegate];
-	}
+	if (_targetDelegate == delegate) return;
 
 	_targetDelegate = delegate;
 
-	if (_targetDelegate != nil)
+	[self configureDelegateFlags];
+}
+
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+	if (![super respondsToSelector:aSelector])
 	{
-		[_delegateMultiplier addTarget:_targetDelegate];
+		return [_targetDelegate respondsToSelector:aSelector];
+	}
+
+	return YES;
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector
+{
+	NSMethodSignature *result = [super methodSignatureForSelector:aSelector];
+	if (result == nil && [_targetDelegate respondsToSelector:aSelector])
+	{
+		result = [(NSObject *)_targetDelegate methodSignatureForSelector:aSelector];
+	}
+
+	return result;
+}
+
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+	if ([_targetDelegate respondsToSelector:[anInvocation selector]])
+	{
+		[anInvocation invokeWithTarget:_targetDelegate];
+	}
+	else
+	{
+		[self doesNotRecognizeSelector:[anInvocation selector]];
 	}
 }
 
@@ -151,6 +193,11 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	NSSet *targetAnnotations = [self.tree annotationsInRect:rect maxTraversalDepth:level];
 	NSMutableSet *sourceAnnotations = [[NSMutableSet alloc] initWithArray:[super annotations]];
 
+	if (self.userLocation != nil)
+	{
+		[sourceAnnotations removeObject:self.userLocation];
+	}
+
 	NSMutableSet *intersect = [[NSMutableSet alloc] initWithSet:targetAnnotations];
 	[intersect intersectSet:sourceAnnotations];
 	[sourceAnnotations minusSet:intersect];
@@ -190,8 +237,19 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
 {
+	MKAnnotationView *view = nil;
+	if (_delegateFlags.viewForAnnotation)
+	{
+		view = [_targetDelegate mapView:mapView viewForAnnotation:annotation];
+	}
+
+	if (view != nil) return view;
+
+	// default implementation
+	if (annotation == self.userLocation) return nil;
+
 	static NSString *identifier = @"annotation";
-	MKAnnotationView *view = [mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
+	view = [mapView dequeueReusableAnnotationViewWithIdentifier:identifier];
 	if (view == nil)
 	{
 		view = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:identifier];
@@ -209,11 +267,21 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	[self confirmTransactionActions:self.activeTransaction];
 
 	[self.activeTransaction mapView:self didAddAnnotationViews:views];
+
+	if (_delegateFlags.didAddAnnotationViews)
+	{
+		[_targetDelegate mapView:mapView didAddAnnotationViews:views];
+	}
 }
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
 {
 	[_updateAnnotationsTimer invalidate];
+
+	if (_delegateFlags.regionWillChangeAnimated)
+	{
+		[_targetDelegate mapView:mapView regionWillChangeAnimated:animated];
+	}
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
@@ -223,6 +291,11 @@ const NSTimeInterval SDMapViewUpdateDelay = 0.3;
 	_updateAnnotationsTimer = [NSTimer scheduledTimerWithTimeInterval:SDMapViewUpdateDelay
 														   invocation:invocation
 															  repeats:NO];
+
+	if (_delegateFlags.regionDidChangeAnimated)
+	{
+		[_targetDelegate mapView:mapView regionDidChangeAnimated:animated];
+	}
 }
 
 #pragma mark - MKMapView
