@@ -3,6 +3,7 @@
 //
 #import "SDMapView.h"
 #import "SDMapView+SDMapTransaction.h"
+#import "SDAnnotation.h"
 
 #import <MapKit/MapKit.h>
 

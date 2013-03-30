@@ -155,10 +155,11 @@ typedef enum
 - (void)updateCount
 {
 	__block NSUInteger leavesCount = _annotations.count;
-	[_leaves enumerateObjectsUsingBlock:^(SDQuadTree *obj, NSUInteger idx, BOOL *stop)
+
+	for (SDQuadTree *leave in _leaves)
 	{
-		leavesCount += obj.count;
-	}];
+		leavesCount += leave.count;
+	}
 
 	[self setCount:leavesCount];
 }
@@ -227,7 +228,7 @@ typedef enum
 
 - (void)insert:(id <MKAnnotation>)annotation
 {
-	NSAssert(annotation != nil, @"Illegal annotation for remove:%@", annotation);
+	NSAssert(annotation != nil, @"Illegal annotation for insert:%@", annotation);
 	NSAssert(![[annotation class] isSubclassOfClass:[SDQuadTree class]], @"Illegal insert class:%@", annotation);
 
 	if (!MKMapRectContainsPoint(self.rect, MKMapPointForCoordinate(annotation.coordinate))) return;
@@ -244,10 +245,10 @@ typedef enum
 		{
 			[self subdivide];
 
-			[self.annotations enumerateObjectsUsingBlock:^(id obj, BOOL *stop)
+			for (id <MKAnnotation> obj in self.annotations)
 			{
 				[[_leaves objectAtIndex:[self leaveIndexForAnnotation:obj]] insert:obj];
-			}];
+			}
 
 			[self setAnnotations:nil];
 		}
@@ -261,7 +262,7 @@ typedef enum
 - (BOOL)remove:(id <MKAnnotation>)annotation
 {
 	NSAssert(annotation != nil, @"Illegal annotation for remove:%@", annotation);
-	NSAssert(![annotation.class isSubclassOfClass:[SDQuadTree class]], @"Illegal insert class:%@", annotation);
+	NSAssert(![annotation.class isSubclassOfClass:[SDQuadTree class]], @"Illegal remove class:%@", annotation);
 
 	BOOL annotationRemoved = NO;
 	if (_leaves != nil)
@@ -291,10 +292,10 @@ typedef enum
 {
 	[self setAnnotations:nil];
 
-	[_leaves enumerateObjectsUsingBlock:^(SDQuadTree *obj, NSUInteger idx, BOOL *stop)
+	for (SDQuadTree *leave in _leaves)
 	{
-		[obj removeAll];
-	}];
+		[leave removeAll];
+	}
 
 	[self processChange:nil ofType:SDQuadTreeChangeRemoveAll];
 }
@@ -313,10 +314,10 @@ typedef enum
 
 	if (_leaves != nil)
 	{
-		[_leaves enumerateObjectsUsingBlock:^(SDQuadTree *obj, NSUInteger idx, BOOL *stop)
+		for (SDQuadTree *leave in _leaves)
 		{
-			[obj appendAnnotations:container inRect:rect maxTraversalDepth:maxTraversalDepth];
-		}];
+			[leave appendAnnotations:container inRect:rect maxTraversalDepth:maxTraversalDepth];
+		}
 
 		return;
 	}
@@ -393,10 +394,10 @@ typedef enum
 
 	if (_leaves != nil)
 	{
-		[_leaves enumerateObjectsUsingBlock:^(SDQuadTree *leave, NSUInteger idx, BOOL *stop)
+		for (SDQuadTree *leave in _leaves)
 		{
 			[leave appendAnnotations:container];
-		}];
+		}
 	}
 
 	[container unionSet:_annotations];
