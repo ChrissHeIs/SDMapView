@@ -8,5 +8,6 @@
 @property (nonatomic, readonly) NSInteger count;
 - (BOOL)contains:(id <MKAnnotation>)annotation;
 - (NSSet *)allAnnotations;
+- (id)anyAnnotation; // for search optimization
 
 @end

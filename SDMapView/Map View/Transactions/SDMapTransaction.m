@@ -37,7 +37,6 @@
 
 - (void)mapView:(SDMapView *)mapView didAddAnnotationViews:(NSArray *)views
 {
-	[NSException raise:@"Subclass error" format:@"Subclass should override %@", NSStringFromSelector(_cmd)];
 }
 
 @end

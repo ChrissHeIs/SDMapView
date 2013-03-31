@@ -2,7 +2,9 @@
 // Created by dmitriy on 23.03.13.
 //
 #import <MapKit/MapKit.h>
+
 #import "SDQuadTree.h"
+#import "NSMutableSet+SDCountTracking.h"
 
 const NSUInteger _SDQuadTreeLeavesCount = 4;
 
@@ -30,8 +32,6 @@ typedef enum
 - (void)processChange:(id <MKAnnotation>)annotation ofType:(SDQuadTreeChangeType)type;
 
 @property (nonatomic) NSInteger count;
-- (void)updateCount;
-
 
 @property (nonatomic, strong) NSMutableSet *annotations;
 - (void)appendAnnotations:(NSMutableSet *)container inRect:(MKMapRect)rect maxTraversalDepth:(NSUInteger)maxTraversalDepth;
@@ -152,18 +152,6 @@ typedef enum
 	[self didChangeValueForKey:@"count"];
 }
 
-- (void)updateCount
-{
-	__block NSUInteger leavesCount = _annotations.count;
-
-	for (SDQuadTree *leave in _leaves)
-	{
-		leavesCount += leave.count;
-	}
-
-	[self setCount:leavesCount];
-}
-
 #pragma mark - Centroid
 
 - (void)setCentroid:(MKMapPoint)centroid
@@ -214,7 +202,11 @@ typedef enum
 {
 	[self updateCentroidWithPoint:MKMapPointForCoordinate(annotation.coordinate) changeType:type];
 
-	[self updateCount];
+	self.count += [self annotationDeltaForChangeType:type];
+
+#ifdef DEBUG
+	NSParameterAssert(_count >= 0);
+#endif
 
 #ifdef SDQUADTREE_TRIM_EMPTY_BRANCH
 	if (self.count == 0)
@@ -226,35 +218,44 @@ typedef enum
 
 #pragma mark - Insert
 
-- (void)insert:(id <MKAnnotation>)annotation
+- (BOOL)insert:(id <MKAnnotation>)annotation
 {
-	NSAssert(annotation != nil, @"Illegal annotation for insert:%@", annotation);
+	NSAssert(annotation != nil, @"Illegal annotation for remove:%@", annotation);
 	NSAssert(![[annotation class] isSubclassOfClass:[SDQuadTree class]], @"Illegal insert class:%@", annotation);
 
-	if (!MKMapRectContainsPoint(self.rect, MKMapPointForCoordinate(annotation.coordinate))) return;
+	if (!MKMapRectContainsPoint(_rect, MKMapPointForCoordinate(annotation.coordinate))) return NO;
 
+	__block BOOL inserted = NO;
 	if (_leaves != nil)
 	{
-		[[_leaves objectAtIndex:[self leaveIndexForAnnotation:annotation]] insert:annotation];
+	 	inserted = [[_leaves objectAtIndex:[self leaveIndexForAnnotation:annotation]] insert:annotation];
 	}
 	else
 	{
-		[self.annotations addObject:annotation];
-
-		if (self.depth < self.maxDepth && SDQuadTreeAnnotationsLimit < self.annotations.count)
+		[self.annotations addObject:annotation onCountChange:^(NSUInteger countBefore, NSUInteger countAfter)
 		{
-			[self subdivide];
+			inserted = YES;
 
-			for (id <MKAnnotation> obj in self.annotations)
+			if (_depth < _maxDepth && SDQuadTreeAnnotationsLimit < countAfter)
 			{
-				[[_leaves objectAtIndex:[self leaveIndexForAnnotation:obj]] insert:obj];
-			}
+				[self subdivide];
 
-			[self setAnnotations:nil];
-		}
+				for (id <MKAnnotation> obj in _annotations)
+				{
+					[[_leaves objectAtIndex:[self leaveIndexForAnnotation:obj]] insert:obj];
+				}
+
+				[self setAnnotations:nil];
+			}
+		}];
 	}
 
-	[self processChange:annotation ofType:SDQuadTreeChangeInsert];
+	if (inserted)
+	{
+		[self processChange:annotation ofType:SDQuadTreeChangeInsert];
+	}
+
+	return inserted;
 }
 
 #pragma mark - Remove
@@ -262,30 +263,31 @@ typedef enum
 - (BOOL)remove:(id <MKAnnotation>)annotation
 {
 	NSAssert(annotation != nil, @"Illegal annotation for remove:%@", annotation);
-	NSAssert(![annotation.class isSubclassOfClass:[SDQuadTree class]], @"Illegal remove class:%@", annotation);
+	NSAssert(![annotation.class isSubclassOfClass:[SDQuadTree class]], @"Illegal insert class:%@", annotation);
 
-	BOOL annotationRemoved = NO;
+	__block BOOL removed = NO;
 	if (_leaves != nil)
 	{
 		NSInteger leaveIndex = [self leaveIndexForAnnotation:annotation];
 		if (leaveIndex != NSNotFound)
 		{
-			annotationRemoved = [[_leaves objectAtIndex:leaveIndex] remove:annotation];
+			removed = [[_leaves objectAtIndex:leaveIndex] remove:annotation];
 		}
 	}
 	else
 	{
-		NSUInteger count = _annotations.count;
-		[_annotations removeObject:annotation];
-		annotationRemoved = count < _annotations.count;
+		[_annotations removeObject:annotation onCountChange:^(NSUInteger countBefore, NSUInteger countAfter)
+		{
+			removed = YES;
+		}];
 	}
 
-	if (annotationRemoved)
+	if (removed)
 	{
 		[self processChange:annotation ofType:SDQuadTreeChangeRemove];
 	}
 
-	return annotationRemoved;
+	return removed;
 }
 
 - (void)removeAll
@@ -410,6 +412,30 @@ typedef enum
 	[self appendAnnotations:results];
 
 	return results;
+}
+
+- (id)anyAnnotation
+{
+	if (self.count == 0) return nil;
+
+	if (_annotations.count > 0)
+	{
+		return [_annotations anyObject];
+	}
+
+	if (_leaves != nil)
+	{
+		for (SDQuadTree *leave in _leaves)
+		{
+			id anyAnnotation = [leave anyAnnotation];
+
+			if (anyAnnotation != nil) return anyAnnotation;
+		}
+	}
+
+	// never reach this point
+
+	return nil;
 }
 
 #pragma mark - Description

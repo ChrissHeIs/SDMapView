@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2CBAFB8116FDC2B3005FE437 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CBAFB8016FDC2B3005FE437 /* MapKit.framework */; };
 		2CBAFB831700AAE6005FE437 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CBAFB821700AAE6005FE437 /* CoreLocation.framework */; };
+		69ED70570B9B78721252FAC7 /* NSMutableSet+SDCountTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = 69ED72435565267C42772EAB /* NSMutableSet+SDCountTracking.m */; };
 		69ED70C92E5825B3FF2FFC24 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 69ED753C0FBA1171B5E42435 /* InfoPlist.strings */; };
 		69ED71A8166E51D8D8B39214 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 69ED76A96CD7FAD781E672EF /* Default-568h@2x.png */; };
 		69ED71D610219574503D89FE /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 69ED7CF4DEE0272CEBED989E /* ViewController_iPad.xib */; };
@@ -41,6 +42,7 @@
 		2CBAFB821700AAE6005FE437 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		69ED718E5C63E80C8628969C /* SDRegularMapTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDRegularMapTransaction.h; sourceTree = "<group>"; };
 		69ED71CCB7CFE84231F50261 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		69ED72435565267C42772EAB /* NSMutableSet+SDCountTracking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMutableSet+SDCountTracking.m"; sourceTree = "<group>"; };
 		69ED724A498353350AECD1A4 /* Airport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Airport.m; sourceTree = "<group>"; };
 		69ED724B5929CDCAE303BA9A /* SDDescendingMapTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDDescendingMapTransaction.m; sourceTree = "<group>"; };
 		69ED739511DBA23CE8B9E77A /* NSMutableDictionary+SetInsertion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableDictionary+SetInsertion.h"; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 		69ED7D7A52AEDDB105376272 /* SDQuadTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDQuadTree.h; sourceTree = "<group>"; };
 		69ED7DA943DD0C8C78ABDC38 /* SDDescendingMapTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDDescendingMapTransaction.h; sourceTree = "<group>"; };
 		69ED7EA101E3A60D61AD77B5 /* SDMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SDMapView.m; sourceTree = "<group>"; };
+		69ED7F31473758D951F0EFC4 /* NSMutableSet+SDCountTracking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableSet+SDCountTracking.h"; sourceTree = "<group>"; };
 		69ED7F757062D7D9415BE6AA /* SDMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDMapView.h; sourceTree = "<group>"; };
 		69ED7F771E567A57460BBBDD /* Airport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Airport.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -169,6 +172,8 @@
 				69ED7C13D8BFE31F5C98DC39 /* NSValue+CLLocationCoordinate2D.m */,
 				69ED7CAAA2A318361606AE4F /* MKMapView+SDTransforms.m */,
 				69ED78DBF9BED68DD31F529D /* MKMapView+SDTransforms.h */,
+				69ED7F31473758D951F0EFC4 /* NSMutableSet+SDCountTracking.h */,
+				69ED72435565267C42772EAB /* NSMutableSet+SDCountTracking.m */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -312,6 +317,7 @@
 				69ED79631F2664C45D855938 /* SDMapTransactionFactory.m in Sources */,
 				69ED7F3D5BE8FF250487EA33 /* SDMapView.m in Sources */,
 				69ED773A99DFB7BECC40CB46 /* MKMapView+SDTransforms.m in Sources */,
+				69ED70570B9B78721252FAC7 /* NSMutableSet+SDCountTracking.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

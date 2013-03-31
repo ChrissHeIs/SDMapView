@@ -28,7 +28,7 @@ static const NSUInteger SDQuadTreeAnnotationsLimit = 1;
 @property (nonatomic, readonly) CLLocationCoordinate2D coordinate;
 @property (nonatomic, readonly) NSInteger count;
 
-- (void)insert:(id <MKAnnotation>)annotation;
+- (BOOL)insert:(id <MKAnnotation>)annotation;
 - (BOOL)remove:(id <MKAnnotation>)annotation;
 
 - (void)removeAll;
